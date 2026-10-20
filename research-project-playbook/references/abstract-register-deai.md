@@ -30,7 +30,7 @@ tensor-parallel degree = "splitting the model across GPUs that inference jointly
 "deploying several complete model instances, each serving its own requests".
 
 The gloss is a **definition, not a metaphor**. Do not reach for cutesy figures ("the three knobs
-on this machine", "think of it as gears"); in formal prose a metaphor reads as childish and_destroys the register you were protecting. Term first, precise definition second, formal verbs
+on this machine", "think of it as gears"); in formal prose a metaphor reads as childish and destroys the register you were protecting. Term first, precise definition second, formal verbs
 throughout. Later mentions use the term bare.
 
 ## 2. AI-tell pattern catalog (structure-level)
