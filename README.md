@@ -1,57 +1,113 @@
+<div align="center">
+
 # Keresearch
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Agent Skills](https://img.shields.io/badge/Agent_Skills-ZCode_%7C_Claude_Code_%7C_Codex-blue)](https://github.com/Infinite-Monkey-Lab/keresearch)
-[![Organization](https://img.shields.io/badge/Infinite_Monkey_Lab-无限猴子实验室-181717?logo=github)](https://github.com/Infinite-Monkey-Lab)
+**从研究问题到论文表达，让每一步都有据可查。**
 
-三个科研 Agent Skill，供 ZCode、Claude Code、Codex 加载，覆盖从选题到投稿的完整流程。`research-project-playbook` 管项目层：选题、实验纪律、记录、投稿。`research-paper-writing` 管篇章层：章节结构、段落衔接、审稿人视角自查。`paper-writing` 管句子层：造句规则、可 grep 的风格门禁、压缩与红队审查。
+三个互补的科研 Agent Skill，分别处理项目决策、篇章结构与句子表达。
 
-装好后，写作问题的入口从“帮我润色这段”变成一组具体检查：这段话有没有踩 M1 到 M18 的哪条禁令，引言里的主张有没有对应实验，摘要里的数字和原始 JSON 是否一致。
+[![License: MIT](https://img.shields.io/badge/License-MIT-24292F?style=flat-square)](LICENSE)
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-ZCode%20%7C%20Claude_Code%20%7C%20Codex-4665D8?style=flat-square)](https://github.com/Infinite-Monkey-Lab/keresearch)
 
-## 为什么分三层
+[选择 Skill](#选择适合当前任务的-skill) · [安装](#安装) · [开始使用](#开始使用) · [参考索引](#参考索引) · [来源与许可](#来源与许可)
 
-用 AI 写论文的常见失败方式，是把所有问题都当作句子问题。润色只处理字面表达。多数初稿的问题出在更早的环节：选题说不清相对哪三篇论文的空档，实验缺单变量对比，正文主张找不到对应的图表数据。三个 Skill 各管一层，哪一层出问题就查哪一层。
+</div>
 
-| Skill | 管什么 | 主要产物 | 来源 |
-| :--- | :--- | :--- | :--- |
-| [`research-project-playbook/`](./research-project-playbook) | 做什么、怎么测、怎么记、投哪里 | 证据链、发现日志、导师汇报卡、投稿清单 | 8 卡 RTX 4090 LLM Serving 实测研究（70+ 配置，F1 到 F18） |
-| [`research-paper-writing/`](./research-paper-writing) | 章节怎么搭、段落怎么流 | 反向大纲、Claim-Evidence 对照表、五维自查 | 彭思达教授科研笔记与 [Master-cai/Research-Paper-Writing-Skills](https://github.com/Master-cai/Research-Paper-Writing-Skills) |
-| [`paper-writing/`](./paper-writing) | 每句话怎么写、怎么砍 | 机械门禁报告、压缩后文本、红队审查问题单 | UC Santa Barbara [SNL-UCSB/paper-writing-skill](https://github.com/SNL-UCSB/paper-writing-skill) |
+Keresearch 将选题、实验记录、论文结构与文字审查整理成 Agent 可加载的工作流程。你提供研究问题、实验材料或初稿，按当前阶段选择一个 Skill，即可开始有针对性的检查。
 
-前一个 Skill 的产物是后一个的输入：发现日志（F1, F2…）支撑章节大纲，章节大纲决定每段写什么，句子门禁处理剩下的表达问题。
+## 选择适合当前任务的 Skill
+
+| 你现在需要 | 使用哪个 Skill | 可以得到什么 |
+| :--- | :--- | :--- |
+| 判断选题、规划实验、整理发现或准备投稿 | [research-project-playbook](research-project-playbook/SKILL.md) | 证据链、实验检查表、发现日志、汇报与投稿清单 |
+| 搭章节、梳理段落、检查论证 | [research-paper-writing](research-paper-writing/SKILL.md) | 反向大纲、主张与证据对照表、审稿自查 |
+| 找论文主线、改句子、压篇幅或审查风格 | [paper-writing](paper-writing/SKILL.md) | 项目语境文件、改稿、机械与语义门禁报告 |
+
+三者可以单独使用，也可以依次衔接：
+
+```text
+项目层                     篇章层                    句子层
+research-project-playbook → research-paper-writing → paper-writing
+选题 · 实验 · 证据          章节 · 段落 · 论证         表达 · 压缩 · 审查
+```
+
+发现日志为章节提供证据，章节大纲明确每段的任务，再对文字做细化审查。无需每次都运行完整流程。
 
 ## 安装
 
-```sh
+### 使用安装脚本
+
+需要 Git 与 Bash。Windows 可在 Git Bash 中运行；安装目录应与实际使用的 Agent 环境一致。
+
+```bash
 git clone https://github.com/Infinite-Monkey-Lab/keresearch.git
 cd keresearch
 bash install.sh
 ```
 
-默认复制三个 Skill 到 `~/.agents/skills/` 与 `~/.claude/skills/`。可选参数：`--link` 改用软链接，之后 `git pull` 即更新；`--zcode` 只装到 `~/.agents/skills/`；`--claude` 只装到 `~/.claude/skills/`。
+默认将三个 Skill 复制到 `~/.agents/skills/` 和 `~/.claude/skills/`。
 
-也可以手动把三个目录复制到所用 Agent 的技能目录：
+> 安装脚本会替换目标目录中已有的同名 Skill。若做过本地修改，请先备份。
 
-```sh
-mkdir -p ~/.agents/skills ~/.claude/skills
-cp -r research-project-playbook research-paper-writing paper-writing ~/.agents/skills/
-cp -r research-project-playbook research-paper-writing paper-writing ~/.claude/skills/
+| 参数 | 安装方式 |
+| :--- | :--- |
+| 不加参数 | 复制到上述两个目录 |
+| `--agents` 或 `--zcode` | 只安装到 `~/.agents/skills/` |
+| `--claude` | 只安装到 `~/.claude/skills/` |
+| `--link` | 用符号链接代替复制，可与一个目标目录参数组合 |
+
+复制安装后，更新仓库并重新运行安装脚本；链接安装后，`git pull` 的改动直接反映到链接目录。使用 `--link` 时，请保留仓库位置并确保系统允许创建符号链接。
+
+### 手动安装
+
+将以下三个目录完整复制到所用 Agent 的技能目录，保留各目录内的 `SKILL.md` 与参考文件：
+
+```text
+research-project-playbook/
+research-paper-writing/
+paper-writing/
 ```
 
-## 用法
+不确定是否加载成功时，可在 Agent 中明确指定 Skill 名称，并让它先确认读取到对应的 `SKILL.md`。不同客户端的调用入口与自动发现方式可能不同。
 
-安装后用 `/技能名` 调用，或直接描述当前任务，Agent 会按需加载对应文件。
+## 开始使用
 
-| 当前阶段 | 调用 | 提问示例 |
-| :--- | :--- | :--- |
-| 有想法，准备开题 | `/research-project-playbook` | 我想做 X 方向，相近工作有 A、B、C。按证据链和 Kill test 检查有没有真空档，再设计 Phase-0 微基准。 |
-| 实验跑完了，理不清主线 | `/paper-writing` | 实验结果在这份文档里。走一遍 6 阶段头脑风暴，逐阶段提问我，最后生成 `project_context.md`。 |
-| 写章节初稿、查段落衔接 | `/research-paper-writing` | 加载 Introduction 指南重构这段引言：给反向大纲，标出每段角色，输出 `Claim \| Evidence \| Status` 对照表。 |
-| 去 AI 味、压篇幅、过门禁 | `/paper-writing` + `/research-project-playbook` | 对照 `abstract-register-deai.md`、M1 到 M18 机械门禁和 S1 到 S31 语义门禁，审计 Abstract 与 Introduction，列出所有命中项。 |
+在对话中写明 **Skill 名称、当前材料、希望得到的结果**。下面的提示可以直接复制，并替换自己的研究信息。
 
-## 各目录文件与规则索引
+<details open>
+<summary>准备开题：检查问题与实验起点</summary>
 
-### 1. [`research-project-playbook/`](./research-project-playbook)：项目与实验纪律
+> 使用 research-project-playbook。我想研究 X，最接近的工作是 A、B、C。先检查研究空档与证据，再设计一个能尽早否定无效方向的 Kill test，以及 Phase-0 微基准。缺失的信息请先问我。
+
+</details>
+
+<details>
+<summary>已有实验：整理论文主线</summary>
+
+> 使用 paper-writing。实验结果在这份文档中。按六阶段头脑风暴逐步向我提问，梳理问题、发现与贡献，最后生成 project_context.md；不要补写材料中不存在的结果。
+
+</details>
+
+<details>
+<summary>已有初稿：检查结构与论证</summary>
+
+> 使用 research-paper-writing，按 Introduction 指南检查这段引言。先给反向大纲，再标出每段的作用，输出 Claim、Evidence、Status 对照表，指出证据缺口。
+
+</details>
+
+<details>
+<summary>准备定稿：压缩表达与审查风格</summary>
+
+> 使用 paper-writing 与 research-project-playbook。对照 M1–M18、S1–S31 和 abstract-register-deai.md 审查摘要与引言，列出命中项，再给出修改稿。保留原始数字、研究范围和不确定性。
+
+</details>
+
+## 参考索引
+
+第一次使用只需选好 Skill；需要了解具体规则时，再展开对应索引。下列门禁和经验规则是本项目的工作约定，使用时应结合学科、文体与目标期刊要求。
+
+<details>
+<summary>项目与实验纪律 · research-project-playbook</summary>
 
 规则蒸馏自一次完整的系统测量研究（8 卡 RTX 4090 集群上的 LLM Serving 测量，70 多个配置，编号发现 F1 到 F18）。十条主规则见 [`research-project-playbook/SKILL.md`](./research-project-playbook/SKILL.md)：
 
@@ -66,13 +122,19 @@ cp -r research-project-playbook research-paper-writing paper-writing ~/.claude/s
 9. **投稿阶梯。** 冲刺一所、务实两所、保底一所、期刊一本。测量研究投对测量友好的会议（MLSys、EuroSys、ICDCS 一线），投机制向会议前先补系统贡献。
 10. **语域与去 AI 味。** 区分论文书面语、学术口头汇报、破冰故事三种语域，混用即失败。细则见 [`references/abstract-register-deai.md`](./research-project-playbook/references/abstract-register-deai.md)：收录对称句式、戏剧化叙事模板、组件名词堆叠、四字排比等结构性 AI 痕迹的判定与改法，附摘要数字预算和替换词表。
 
-### 2. [`research-paper-writing/`](./research-paper-writing)：章节结构与审稿自查
+</details>
+
+<details>
+<summary>章节结构与审稿自查 · research-paper-writing</summary>
 
 - 六个章节指南：[`abstract.md`](./research-paper-writing/references/abstract.md)、[`introduction.md`](./research-paper-writing/references/introduction.md)、[`related-work.md`](./research-paper-writing/references/related-work.md)、[`method.md`](./research-paper-writing/references/method.md)、[`experiments.md`](./research-paper-writing/references/experiments.md)、[`conclusion.md`](./research-paper-writing/references/conclusion.md)，各给出段落职责与句式模板。
 - 段落清晰度与反向大纲（[`does-my-writing-flow-source.md`](./research-paper-writing/references/does-my-writing-flow-source.md)）：先检查一段是否只传递一个信息、首句是否点题，再做反向大纲，把每段主题句映射回论文主张，映射不上就改或删。
 - 五维审稿自查（[`paper-review.md`](./research-paper-writing/references/paper-review.md)）：从贡献度、写作清晰度、实验强度、评估完整性、方法合理性五个维度模拟审稿人挑刺，配合 `Claim | Evidence | Status` 对照表逐项销账。
 
-### 3. [`paper-writing/`](./paper-writing)：句子工艺与双门禁
+</details>
+
+<details>
+<summary>句子工艺与双门禁 · paper-writing</summary>
 
 源自 UC Santa Barbara 系统与网络实验室对 6 篇论文、7,600 多次 Overleaf 修订与 5 轮同行评审的逐句分析，经本仓库适配中英文场景。
 
@@ -84,14 +146,22 @@ cp -r research-project-playbook research-paper-writing paper-writing ~/.claude/s
 - **非数据图表合成**（[`figure_synthesis_guide.md`](./paper-writing/figure_synthesis_guide.md) 与 [`figure_templates/`](./paper-writing/figure_templates)）：架构图与流程图的规格定义、生成与审查流程，附 TikZ 模板。
 - **独立红队与循环审计**（[`red_team_protocol.md`](./paper-writing/red_team_protocol.md)、[`loop_mode.md`](./paper-writing/loop_mode.md)）：由未参与起草的审查实例重跑机械门禁与语义门禁，输出逐条问题清单；`/loop` 模式支持落盘账本、逐章迭代，直到零严重问题后自动停止。
 
+</details>
+
 ## 参与贡献
 
-欢迎提 Issue 或 Pull Request：补充其他学科方向的写作检查表或去 AI 味词表，贡献数字一致性、符号冲突、LaTeX 边距溢出这类审计脚本，或分享你在实际写作与 Rebuttal 中验证有效的规则。具体流程见 [`CONTRIBUTING.md`](./CONTRIBUTING.md)，新手可从带 `good first issue` 标签的任务入手。
+欢迎补充其他学科的检查表、经过实际改稿验证的规则，或数字一致性、符号冲突、LaTeX 排版等审计脚本。
 
-## 许可与致谢
+贡献流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。你也可以从 [Issues](https://github.com/Infinite-Monkey-Lab/keresearch/issues) 中选择任务，说明问题、示例与预期改进。
 
-本仓库按 [MIT License](./LICENSE) 分发，三个子目录各自保留上游署名与许可证：
+## 来源与许可
 
-- `research-project-playbook/`：MIT License，Infinite Monkey Lab。
-- `paper-writing/`：MIT License，源自 [SNL-UCSB/paper-writing-skill](https://github.com/SNL-UCSB/paper-writing-skill)，Copyright (c) 2026 Arpit Gupta（见 [`paper-writing/LICENSE`](./paper-writing/LICENSE)）。
-- `research-paper-writing/`：MIT License，源自彭思达教授公开笔记与 [Master-cai/Research-Paper-Writing-Skills](https://github.com/Master-cai/Research-Paper-Writing-Skills)，Copyright (c) 2026 Master-cai（见 [`research-paper-writing/LICENSE`](./research-paper-writing/LICENSE) 与 [`ATTRIBUTION.md`](./research-paper-writing/ATTRIBUTION.md)）。
+本仓库按 [MIT License](LICENSE) 分发，保留各子目录的上游署名与许可证。
+
+| Skill | 来源与署名 |
+| :--- | :--- |
+| research-project-playbook | 蒸馏自 8 卡 RTX 4090 LLM Serving 测量研究，70+ 配置、F1–F18 发现记录；Infinite Monkey Lab |
+| research-paper-writing | 彭思达教授公开科研笔记与 [Master-cai/Research-Paper-Writing-Skills](https://github.com/Master-cai/Research-Paper-Writing-Skills)；见 [署名说明](research-paper-writing/ATTRIBUTION.md)及 [MIT 许可证](research-paper-writing/LICENSE)，Copyright (c) 2026 Master-cai |
+| paper-writing | [SNL-UCSB/paper-writing-skill](https://github.com/SNL-UCSB/paper-writing-skill)；见 [MIT 许可证](paper-writing/LICENSE)，Copyright (c) 2026 Arpit Gupta |
+
+由 [Infinite Monkey Lab](https://github.com/Infinite-Monkey-Lab) 维护。
